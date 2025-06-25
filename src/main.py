@@ -38,12 +38,12 @@ global songtime
 @bot.event
 async def on_connect():
     print(cs(f'[{time.ctime()}] Info: Logging in as {bot.user.name}. Please stand by...', "green"))
-    asyncio.sleep(20)
+    await asyncio.sleep(20)
     while True:
         if os.path.exists("out"):
             shutil.rmtree("out")
             print(cs(f'[{time.ctime()}] Info: Out folder cleared as per routine.', "green"))
-        asyncio.sleep(600)
+        await asyncio.sleep(600)
 
 
 @bot.event
@@ -118,7 +118,6 @@ async def join(ctx):
     await asyncio.sleep(9)
     source = await nextcord.FFmpegOpusAudio.from_probe(f"env/out/{ctx.guild.id}.mp3", method="fallback")
     ctx.voice_client.play(source)
-    
 
 @bot.command(help="Disonnects the bot from a voice channel", aliases=["disconnect"])
 async def leave(ctx):
