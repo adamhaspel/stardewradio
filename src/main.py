@@ -9,6 +9,7 @@ import random
 from mutagen import File
 import asyncio
 from pydub import AudioSegment
+import shutil
 
 TESTING_GUILD_ID = 1386354564441182268
 
@@ -37,6 +38,13 @@ global songtime
 @bot.event
 async def on_connect():
     print(cs(f'[{time.ctime()}] Info: Logging in as {bot.user.name}. Please stand by...', "green"))
+    asyncio.sleep(20)
+    while True:
+        if os.path.exists("out"):
+            shutil.rmtree("out")
+            print(cs(f'[{time.ctime()}] Info: Out folder cleared as per routine.', "green"))
+        asyncio.sleep(600)
+
 
 @bot.event
 async def on_ready():
@@ -65,7 +73,7 @@ async def on_ready():
         xtra = ""
         if round(length % 60) < 10:
             xtra = "0"
-        print(cs(f'[{time.ctime()}] Song: Now playing "{songname}" for 0{round(length/60)}:{xtra}{round(length % 60)}', "green"))
+        print(cs(f'[{time.ctime()}] Song: Now playing "{songname}" for 0{round(length/60)}:{xtra}{round(length % 60)}.', "green"))
         songtime = 0
         while songtime <= length:
             await asyncio.sleep(1)
@@ -98,7 +106,7 @@ async def join(ctx):
             await ctx.send(f"```Joining {ctx.author.voice.channel.name}...```")
             await ctx.author.voice.channel.connect()
     input_file = f"assets/audio/ost/{song}"
-    output_file = f"out/{ctx.guild.id}.mp3"
+    output_file = f"env/out/{ctx.guild.id}.mp3"
     start_time = round((9 + songtime)* 1000)
     audio = File(f"assets/audio/ost/{song}")
     end_time = round(1000* audio.info.length)
@@ -108,7 +116,7 @@ async def join(ctx):
     source = await nextcord.FFmpegOpusAudio.from_probe(f"assets/audio/sfx/syntheffect1.mp3", method="fallback")
     ctx.voice_client.play(source)
     await asyncio.sleep(9)
-    source = await nextcord.FFmpegOpusAudio.from_probe(f"out/{ctx.guild.id}.mp3", method="fallback")
+    source = await nextcord.FFmpegOpusAudio.from_probe(f"env/out/{ctx.guild.id}.mp3", method="fallback")
     ctx.voice_client.play(source)
     
 
