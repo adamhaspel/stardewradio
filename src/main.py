@@ -125,12 +125,6 @@ async def join(ctx):
     audio = AudioSegment.from_mp3(input_file)
     sliced_audio = audio[start_time:end_time]
     sliced_audio.export(output_file, format="mp3")
-    ctx.voice_client.volume = 1
-    source = nextcord.FFmpegPCMAudio(f"assets/audio/sfx/syntheffect1.mp3")
-    source = nextcord.PCMVolumeTransformer(source)
-    source.volume = ctx.voice_client.volume
-    ctx.voice_client.play(source)
-    await asyncio.sleep(9)
     source = nextcord.FFmpegPCMAudio(f"env/out/{ctx.guild.id}.mp3")
     source = nextcord.PCMVolumeTransformer(source)
     source.volume = ctx.voice_client.volume
@@ -221,7 +215,7 @@ async def tunein(ctx):
                 await ctx.send("```You are not in a voice channel. You must be in a voice channel to use this command.```")
                 return
     if ctx.voice_client.is_playing():
-        await ctx.send("```I am still playing. The radio must be tuned out for this command to work.```")
+        await ctx.send("```I am still playing. The radio must be tuned out for this command to work.`")
     input_file = f"assets/audio/ost/{song}"
     output_file = f"env/out/{ctx.guild.id}.mp3"
     start_time = round((9 + songtime)* 1000)
@@ -230,11 +224,6 @@ async def tunein(ctx):
     audio = AudioSegment.from_mp3(input_file)
     sliced_audio = audio[start_time:end_time]
     sliced_audio.export(output_file, format="mp3")
-    source = nextcord.FFmpegPCMAudio(f"assets/audio/sfx/syntheffect1.mp3")
-    source = nextcord.PCMVolumeTransformer(source)
-    source.volume = ctx.voice_client.volume
-    ctx.voice_client.play(source)
-    await asyncio.sleep(9)
     source = nextcord.FFmpegPCMAudio(f"env/out/{ctx.guild.id}.mp3")
     source = nextcord.PCMVolumeTransformer(source)
     source.volume = ctx.voice_client.volume
