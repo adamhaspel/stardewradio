@@ -42,6 +42,7 @@ async def on_connect():
         if os.path.exists("env/out"):
             shutil.rmtree("env/out")
             print(cs(f'[{time.ctime()}] Info: Out folder cleared as per routine.', "green"))
+        os.mkdir("env/out")
         await asyncio.sleep(300)
 
 
