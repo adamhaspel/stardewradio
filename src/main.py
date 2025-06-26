@@ -36,18 +36,21 @@ global song
 global songtime
 
 @bot.event
-async def on_connvect():
+async def on_connect():
     print(cs(f'[{time.ctime()}] Info: Logging in as {bot.user.name}. Please stand by...', "green"))
     while True:
         if os.path.exists("env/out"):
             shutil.rmtree("env/out")
             print(cs(f'[{time.ctime()}] Info: Out folder cleared as per routine.', "green"))
-        await asyncio.sleep(600)
+        await asyncio.sleep(300)
 
 
 @bot.event
 async def on_ready():
+    if not os.path.exists("env/out"):
+        os.mkdir("env/out")
     print(cs(f'[{time.ctime()}] Info: {bot.user.name} is ready to function.', "green"))
+    await asyncio.sleep(.5)
     print(cs(f'[{time.ctime()}] Info: Radio is online.', "green"))
     while True:
         global song
@@ -92,7 +95,8 @@ async def on_disconnect():
 async def on_close():
     for i in bot.guilds:
         if bot.get_guild(i.id).voice_client:
-            await bot.get_guild(i.id).voice_client.disconnect()
+            await bot.get_guild(i.id).voice_client.stop()
+    await asyncio.sleep(1)
     print(cs(f'\r[{time.ctime()}] Info: {bot.user.name} is logging off.', "green"))
 
 @bot.command(help="Connects the bot to a voice channel", aliases=["connect"])
@@ -121,8 +125,10 @@ async def join(ctx):
     audio = AudioSegment.from_mp3(input_file)
     sliced_audio = audio[start_time:end_time]
     sliced_audio.export(output_file, format="mp3")
+    ctx.voice_client.volume = 1
     source = nextcord.FFmpegPCMAudio(f"assets/audio/sfx/syntheffect1.mp3")
     source = nextcord.PCMVolumeTransformer(source)
+    source.volume = ctx.voice_client.volume
     ctx.voice_client.play(source)
     await asyncio.sleep(9)
     source = nextcord.FFmpegPCMAudio(f"env/out/{ctx.guild.id}.mp3")
@@ -165,7 +171,7 @@ async def volume(ctx, volume=None):
     else:
         vc = nextcord.utils.get(bot.voice_clients, guild=ctx.guild)
         if vc:
-            await ctx.send(f"```Volume is set to {vc.volume*100}%.```")
+            await ctx.send(f"```Volume is set to {int(vc.volume*100)}%.```")
         else:
             await ctx.send("```I am not in a voice channel. I must be in a voice channel to use this command.```")
 
@@ -226,6 +232,7 @@ async def tunein(ctx):
     sliced_audio.export(output_file, format="mp3")
     source = nextcord.FFmpegPCMAudio(f"assets/audio/sfx/syntheffect1.mp3")
     source = nextcord.PCMVolumeTransformer(source)
+    source.volume = ctx.voice_client.volume
     ctx.voice_client.play(source)
     await asyncio.sleep(9)
     source = nextcord.FFmpegPCMAudio(f"env/out/{ctx.guild.id}.mp3")
