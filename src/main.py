@@ -117,6 +117,7 @@ async def join(ctx):
         else:
             await ctx.send(f"```Joining {ctx.author.voice.channel.name}...```")
             await ctx.author.voice.channel.connect()
+    ctx.voice_client.volume = 1
     input_file = f"assets/audio/ost/{song}"
     output_file = f"env/out/{ctx.guild.id}.mp3"
     start_time = round((9 + songtime)* 1000)
@@ -125,10 +126,18 @@ async def join(ctx):
     audio = AudioSegment.from_mp3(input_file)
     sliced_audio = audio[start_time:end_time]
     sliced_audio.export(output_file, format="mp3")
-    source = nextcord.FFmpegPCMAudio(f"env/out/{ctx.guild.id}.mp3")
-    source = nextcord.PCMVolumeTransformer(source)
+    source = nextcord.FFmpegPCMAudio(f"assets/audio/sfx/syntheffect1.mp3")
     source.volume = ctx.voice_client.volume
     ctx.voice_client.play(source)
+    while True:
+        try:
+            source = nextcord.FFmpegPCMAudio(f"env/out/{ctx.guild.id}.mp3")
+            source.volume = ctx.voice_client.volume
+            ctx.voice_client.play(source)
+            break
+        except:
+            await asyncio.sleep(1)
+            continue
 
 @bot.command(help="Changes the volume of the radio")
 async def volume(ctx, volume=None):
@@ -157,6 +166,7 @@ async def volume(ctx, volume=None):
         except:
             await ctx.send("```Please enter a volume between 0 and 100.```")
         if 0 <= int(volume) <= 100:
+            vc.source = nextcord.PCMVolumeTransformer(vc.source)
             vc.source.volume = int(volume)/100
             vc.volume = int(volume)/100
             await ctx.send(f"```Volume set to {volume}%.```")
@@ -216,6 +226,10 @@ async def tunein(ctx):
                 return
     if ctx.voice_client.is_playing():
         await ctx.send("```I am still playing. The radio must be tuned out for this command to work.`")
+    ctx.voice_client.volume = 1
+    source = nextcord.FFmpegPCMAudio(f"assets/audio/sfx/syntheffect1.mp3")
+    source.volume = ctx.voice_client.volume
+    ctx.voice_client.play(source)
     input_file = f"assets/audio/ost/{song}"
     output_file = f"env/out/{ctx.guild.id}.mp3"
     start_time = round((9 + songtime)* 1000)
@@ -224,10 +238,15 @@ async def tunein(ctx):
     audio = AudioSegment.from_mp3(input_file)
     sliced_audio = audio[start_time:end_time]
     sliced_audio.export(output_file, format="mp3")
-    source = nextcord.FFmpegPCMAudio(f"env/out/{ctx.guild.id}.mp3")
-    source = nextcord.PCMVolumeTransformer(source)
-    source.volume = ctx.voice_client.volume
-    ctx.voice_client.play(source)
+    while True:
+        try:
+            source = nextcord.FFmpegPCMAudio(f"env/out/{ctx.guild.id}.mp3")
+            source.volume = ctx.voice_client.volume
+            ctx.voice_client.play(source)
+            break
+        except:
+            await asyncio.sleep(1)
+            continue
 
 @bot.command(help="Disonnects the bot from a voice channel", aliases=["disconnect"])
 async def leave(ctx):
